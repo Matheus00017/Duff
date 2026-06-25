@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -15,9 +15,8 @@
       <span class="logo-text">DUFF</span>
     </div>
     <nav>
-      <a href="HTML/estoque.html" class="nav-btn">Estoque</a>
-      <a href="HTML/Vendas.html" class="nav-btn">Vendas</a>
-      <a href="HTML/Pedido.html" class="nav-btn">Pedidos</a>
+      <button class="nav-btn" onclick="alert('Modulo Estoque em breve!')">Estoque</button>
+      <button class="nav-btn" onclick="alert('Modulo Vendas em breve!')">Vendas</button>
       <div class="dropdown">
         <button class="nav-btn" id="btnCadastro" onclick="toggleDropdown()">Cadastro ▾</button>
         <div class="dropdown-menu" id="dropdownMenu">
@@ -28,7 +27,23 @@
     </nav>
   </header>
 
-  <!-- SOBRE NÓS -->
+  <!-- CATEGORY BAR -->
+  <div class="category-bar" id="categoryBar">
+    <button class="cat-btn active" data-tipo="" onclick="filterProducts(this, '')">
+      <span class="icon">🍽</span>
+      <span>Todas</span>
+    </button>
+  </div>
+
+  <!-- PRODUCTS -->
+  <section class="products-section">
+    <h2>NOSSOS PRODUTOS</h2>
+    <div class="products-grid" id="productsGrid">
+      <div class="loading-msg">Carregando produtos...</div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
   <section class="about-section">
     <div class="about-content">
       <h2>NOSSA HISTORIA</h2>

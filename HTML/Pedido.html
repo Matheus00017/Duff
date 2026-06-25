@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DUFF - Distribuidora de Bebidas</title>
+  <link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <a href="../index.html">
+        <img src="../img/logo.png" alt="DUFF" onerror="this.style.display='none'">
+      </a>
+      <span class="logo-text">DUFF</span>
+    </div>
+    <nav>
+      <a href="../HTML/estoque.html" class="nav-btn">Estoque</a>
+      <a href="../HTML/Vendas.html" class="nav-btn">Vendas</a>
+      <div class="dropdown">
+        <button class="nav-btn" id="btnCadastro" onclick="toggleDropdown()">Cadastro ▾</button>
+        <div class="dropdown-menu" id="dropdownMenu">
+          <button class="dropdown-item" onclick="openCadastro('colaborador')">Cadastrar Funcionarios</button>
+          <button class="dropdown-item" onclick="openCadastro('empresa')">Cadastrar Empresa</button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- CATEGORIAS DE PRODUTOS -->
+  <div class="category-bar" id="categoryBar">
+    <button class="cat-btn active" data-tipo="" onclick="filterProducts(this, '')">
+      <span class="icon">🍽</span>
+      <span>Todas</span>
+    </button>
+  </div>
+
+  <!-- PRODUTOS -->
+  <section class="products-section">
+    <h2>NOSSOS PRODUTOS</h2>
+    <div class="products-grid" id="productsGrid">
+      <div class="loading-msg">Carregando produtos...</div>
+    </div>
+  
+  </section>
+
+  <footer>
+    <p>&copy; 2026 DUFF Distribuidora de Bebidas. Todos os direitos reservados.</p>
+  </footer>
+
+  <script src="../JS/script.js"></script>
+</body>
+</html>
+

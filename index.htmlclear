@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DUFF - Distribuidora de Bebidas</title>
-  <link rel="stylesheet" href="CSS/style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -15,20 +15,35 @@
       <span class="logo-text">DUFF</span>
     </div>
     <nav>
-      <a href="HTML/estoque.html" class="nav-btn">Estoque</a>
-      <a href="HTML/Vendas.html" class="nav-btn">Vendas</a>
-      <a href="HTML/Pedido.html" class="nav-btn">Pedidos</a>
+      <button class="nav-btn" onclick="alert('Modulo Estoque em breve!')">Estoque</button>
+      <button class="nav-btn" onclick="alert('Modulo Vendas em breve!')">Vendas</button>
       <div class="dropdown">
         <button class="nav-btn" id="btnCadastro" onclick="toggleDropdown()">Cadastro ▾</button>
         <div class="dropdown-menu" id="dropdownMenu">
-          <button class="dropdown-item" onclick="openCadastro('colaborador')">Cadastrar Funcionarios</button>
+          <button class="dropdown-item" onclick="openCadastro('colaborador')">Cadastrar Colaborador</button>
           <button class="dropdown-item" onclick="openCadastro('empresa')">Cadastrar Empresa</button>
         </div>
       </div>
     </nav>
   </header>
 
-  <!-- SOBRE NÓS -->
+  <!-- CATEGORY BAR -->
+  <div class="category-bar" id="categoryBar">
+    <button class="cat-btn active" data-tipo="" onclick="filterProducts(this, '')">
+      <span class="icon">🍽</span>
+      <span>Todas</span>
+    </button>
+  </div>
+
+  <!-- PRODUCTS -->
+  <section class="products-section">
+    <h2>NOSSOS PRODUTOS</h2>
+    <div class="products-grid" id="productsGrid">
+      <div class="loading-msg">Carregando produtos...</div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
   <section class="about-section">
     <div class="about-content">
       <h2>NOSSA HISTORIA</h2>
@@ -40,18 +55,11 @@
          onmouseenter="pauseCarousel()"
          onmouseleave="resumeCarousel()">
       <div class="carousel-track" id="carouselTrack">
-        <div class="carousel-slide">
-          <img src="img/carrossel/prateleiras 1.png" alt="prateleira" onerror="this.style.display='none'">
-        </div>
-        <div class="carousel-slide">
-          <img src="img/carrossel/prateleiras 2.png" alt="prateleira" onerror="this.style.display='none'">
-        </div>
-        <div class="carousel-slide">
-          <img src="img/carrossel/prateleiras 3.png" alt="prateleira" onerror="this.style.display='none'">
-        </div>
-        <div class="carousel-slide">
-          <img src="img/carrossel/prateleiras 4.png" alt="prateleira" onerror="this.style.display='none'">
-        </div>
+        <div class="carousel-slide">🍺</div>
+        <div class="carousel-slide">🍷</div>
+        <div class="carousel-slide">🥃</div>
+        <div class="carousel-slide">🍾</div>
+        <div class="carousel-slide">🍹</div>
       </div>
       <button class="carousel-btn prev" onclick="moveCarousel(-1)">&#8249;</button>
       <button class="carousel-btn next" onclick="moveCarousel(1)">&#8250;</button>

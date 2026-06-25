@@ -1,7 +1,20 @@
 
 ```
 Duff
+├─ .env
+├─ CSS
+│  └─ style.css
+├─ db.js
+├─ HTML
+│  ├─ estoque.html
+│  ├─ Produtos.html
+│  └─ Vendas.html
 ├─ img
+│  ├─ carrossel
+│  │  ├─ prateleiras 1.png
+│  │  ├─ prateleiras 2.png
+│  │  ├─ prateleiras 3.png
+│  │  └─ prateleiras 4.png
 │  ├─ Cerveja
 │  │  ├─ Engradados
 │  │  │  ├─ Amstel.png
@@ -208,10 +221,12 @@ Duff
 │     ├─ Jameson.png
 │     └─ Johnnie Walker.png
 ├─ index.html
+├─ index.htmlclear
 ├─ JS
 │  └─ script.js
 ├─ package-lock.json
 ├─ package.json
-└─ README.md
+├─ README.md
+└─ server.js
 
 ```
