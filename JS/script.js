@@ -190,6 +190,7 @@ async function loadProducts(tipoId) {
     produtos.forEach(p => {
       const card = document.createElement('div');
       card.className = 'product-card';
+      if (p.cor) card.style.backgroundColor = p.cor;
       const preco = parseFloat(p.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
       const imgContent = p.imagem
         ? `<img class="product-img" src="/${p.imagem}" alt="${p.nome}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
@@ -218,7 +219,7 @@ function filterProducts(btn, tipoId) {
   loadProducts(tipoId);
 }
 
-// ===== CAROUSEL =====
+// ===== CARROSSEL =====
 let carouselIndex = 0;
 let carouselTimer = null;
 const SLIDES_TOTAL = 4;

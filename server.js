@@ -21,7 +21,7 @@ app.get('/api/tipos-bebida', async (req, res) => {
 
 app.get('/api/produtos', async (req, res) => {
   try {
-    let sql = 'SELECT p.id, p.nome, p.preco, p.quantidade_estoque, p.tipo_unidade, p.imagem, t.nome AS tipo, t.icone FROM produtos p JOIN tipos_bebida t ON p.id_tipo = t.id';
+    let sql = 'SELECT p.id, p.nome, p.preco, p.quantidade_estoque, p.tipo_unidade, p.imagem, t.nome AS tipo, t.icone, t.cor FROM produtos p JOIN tipos_bebida t ON p.id_tipo = t.id';
     const params = [];
     if (req.query.tipo) {
       sql += ' WHERE p.id_tipo = ?';
