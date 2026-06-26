@@ -190,27 +190,40 @@ async function loadProducts(tipoId) {
     produtos.forEach(p => {
       const card = document.createElement('div');
       card.className = 'product-card';
-      if (p.cor) card.style.backgroundColor = p.cor;
       const preco = parseFloat(p.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
       const imgContent = p.imagem
         ? `<img class="product-img" src="/${p.imagem}" alt="${p.nome}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
         + `<span class="product-emoji" style="display:none">${p.icone || '🍹'}</span>`
         : `<span class="product-emoji">${p.icone || '🍹'}</span>`;
       card.innerHTML = `
-        <div class="product-img-wrap">${imgContent}</div>
-        <div class="product-info">
-          <div class="product-name">${p.nome}</div>
-          <div class="product-type">${p.tipo}</div>
-          <div class="product-unit">${p.tipo_unidade}</div>
-          <div class="product-price">${preco}</div>
-          <div class="product-stock">Estoque: ${p.quantidade_estoque}</div>
+         <div class="product-img-wrap" style="background:${p.cor || '#B8D4E8'}">${imgContent}</div>
+      <div class="product-info" style="background:#F0F8FC">
+        <div class="product-name">${p.nome}</div>
+        <div class="product-price">R$: ${parseFloat(p.preco).toFixed(2).replace('.', ',')}</div>
+        <div class="product-qty">
+          <button class="qty-btn" onclick="changeQty(this,-1)">-</button>
+          <input class="qty-input" type="number" value="0" min="0">
+          <button class="qty-btn" onclick="changeQty(this,1)">+</button>
         </div>
+        <button class="btn-comprar" onclick="comprar(this,${p.id},\`${p.nome}\`)">Comprar</button>
+      </div>
       `;
       grid.appendChild(card);
     });
   } catch (err) {
     grid.innerHTML = '<div class="error-msg">Erro ao carregar produtos. Verifique a API.</div>';
   }
+}
+
+function changeQty(btn, dir) {
+  const input = btn.parentElement.querySelector('.qty-input');
+  input.value = Math.max(0, parseInt(input.value) + dir);
+}
+
+function comprar(btn, id, nome) {
+  const qty = parseInt(btn.parentElement.querySelector('.qty-input').value);
+  if (qty <= 0) { alert('Selecione a quantidade antes de comprar.'); return; }
+  alert(qty + 'x ' + nome + ' adicionado ao pedido!');
 }
 
 function filterProducts(btn, tipoId) {
@@ -257,8 +270,48 @@ function initCarousel() {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
-  loadCategories();
-  loadProducts('');
-  initCarousel();
+  if (document.getElementById('categoryBar')) loadCategories();
+  if (document.getElementById('productsGrid')) loadProducts('');
+  if (document.getElementById('carouselDots')) initCarousel();
 });
+
+async function loadDashboard() {
+  try {
+    const res = await fetch('/api/dashboard');
+    const data = await res.json();
+
+    document.getElementById('totalVendas').textContent =
+      parseFloat(data.totalMes || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    document.getElementById('totalPedidos').textContent = data.pedidosMes || 0;
+
+    document.getElementById('vendasHoje').textContent =
+      parseFloat(data.vendasHoje || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    // Gráfico
+    const ctx = document.getElementById('graficoVendas').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: data.ultimos7dias.map(d => d.data),
+        datasets: [{
+          label: 'Vendas (R$)',
+          data: data.ultimos7dias.map(d => d.total),
+          backgroundColor: '#D98E2B',
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+  } catch (err) {
+    console.error('Erro ao carregar dashboard:', err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadDashboard);
 

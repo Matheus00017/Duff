@@ -145,6 +145,27 @@ app.get('/api/vendas/dashboard', async (req, res) => {
   }
 });
 
+app.get('/api/dashboard', async (req, res) => {
+  try {
+    const [[{ totalMes }]] = await pool.query(
+      "SELECT COALESCE(SUM(total),0) AS totalMes FROM pedidos WHERE MONTH(data_pedido)=MONTH(NOW()) AND YEAR(data_pedido)=YEAR(NOW())"
+    );
+    const [[{ pedidosMes }]] = await pool.query(
+      "SELECT COUNT(*) AS pedidosMes FROM pedidos WHERE MONTH(data_pedido)=MONTH(NOW()) AND YEAR(data_pedido)=YEAR(NOW())"
+    );
+    const [[{ vendasHoje }]] = await pool.query(
+      "SELECT COALESCE(SUM(total),0) AS vendasHoje FROM pedidos WHERE DATE(data_pedido)=CURDATE()"
+    );
+    const [ultimos7dias] = await pool.query(
+      "SELECT DATE(data_pedido) AS data, COALESCE(SUM(total),0) AS total FROM pedidos WHERE data_pedido >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY DATE(data_pedido) ORDER BY data"
+    );
+    res.json({ totalMes, pedidosMes, vendasHoje, ultimos7dias });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+});
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('API DUFF rodando em http://localhost:' + PORT));
 

@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DUFF - Distribuidora de Bebidas</title>
+  <title>DUFF - Dashboard de Vendas</title>
   <link rel="stylesheet" href="../CSS/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -13,12 +14,11 @@
       <a href="../index.html">
         <img src="../img/logo.png" alt="DUFF" onerror="this.style.display='none'">
       </a>
+      <span class="logo-text">DUFF</span>
     </div>
     <nav>
-      <button class="nav-btn" onclick="alert('Modulo Estoque em breve!')">Estoque</button>
-      <button class="nav-btn" onclick="alert('Modulo Vendas em breve!')">Vendas</button>
-      <a href="HTML/Produtos.html" class="nav-btn">Estoque</a>
-      
+      <a href="Pedido.html" class="nav-btn">Pedido</a>
+      <a href="Estoque.html" class="nav-btn">Estoque</a>
       <div class="dropdown">
         <button class="nav-btn" id="btnCadastro" onclick="toggleDropdown()">Cadastro ▾</button>
         <div class="dropdown-menu" id="dropdownMenu">
@@ -29,57 +29,42 @@
     </nav>
   </header>
 
-  <!-- CATEGORY BAR -->
-  <div class="category-bar" id="categoryBar">
-    <button class="cat-btn active" data-tipo="" onclick="filterProducts(this, '')">
-      <span class="icon">🍽</span>
-      <span>Todas</span>
-    </button>
-  </div>
+  <main class="dashboard">
 
-  <!-- PRODUCTS -->
-  <section class="products-section">
-    <h2>NOSSOS PRODUTOS</h2>
-    <div class="products-grid" id="productsGrid">
-      <div class="loading-msg">Carregando produtos...</div>
-    </div>
-  </section>
+    <h1 class="dash-title">Dashboard de Vendas</h1>
 
-  <!-- ABOUT -->
-  <section class="about-section">
-    <div class="about-content">
-      <h2>NOSSA HISTORIA</h2>
-      <p>A DUFF nasceu de um sonho simples: levar as melhores bebidas diretamente a quem mais entende do assunto. Tudo comecou em uma garagem, com um caminhao velho e muita vontade de servir bem.</p>
-      <p>Hoje somos uma distribuidora completa, com um catalogo que vai desde as cervejas artesanais ate os melhores vinhos e destilados importados. Cada produto escolhido a dedo, cada entrega feita com cuidado.</p>
-      <p>Seja para o seu bar, restaurante ou evento especial, a DUFF tem o que voce precisa. Qualidade, variedade e o preco que cabe no seu bolso.</p>
-    </div>
-    <div class="carousel" id="carousel"
-         onmouseenter="pauseCarousel()"
-         onmouseleave="resumeCarousel()">
-      <div class="carousel-track" id="carouselTrack">
-        <div class="carousel-slide">
-          <img src="../img/carrossel/prateleiras 1.png" alt="prateleira" onerror="this.style.display='none'">
-        </div>
-        <div class="carousel-slide">
-          <img src="../img/carrossel/prateleiras 2.png" alt="prateleira" onerror="this.style.display='none'">
-        </div>
-        <div class="carousel-slide">
-          <img src="../img/carrossel/prateleiras 3.png" alt="prateleira" onerror="this.style.display='none'">
-        </div>
-        <div class="carousel-slide">
-          <img src="../img/carrossel/prateleiras 4.png" alt="prateleira" onerror="this.style.display='none'">
+    <!-- CARDS DE RESUMO -->
+    <div class="dash-cards">
+      <div class="dash-card">
+        <div class="dash-card-icon">💰</div>
+        <div class="dash-card-info">
+          <span class="dash-card-label">Total de Vendas (mês)</span>
+          <span class="dash-card-value" id="totalVendas">Carregando...</span>
         </div>
       </div>
-      <button class="carousel-btn prev" onclick="moveCarousel(-1)">&#8249;</button>
-      <button class="carousel-btn next" onclick="moveCarousel(1)">&#8250;</button>
-      <div class="carousel-dots" id="carouselDots"></div>
+      <div class="dash-card">
+        <div class="dash-card-icon">📦</div>
+        <div class="dash-card-info">
+          <span class="dash-card-label">Pedidos (mês)</span>
+          <span class="dash-card-value" id="totalPedidos">Carregando...</span>
+        </div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-icon">📅</div>
+        <div class="dash-card-info">
+          <span class="dash-card-label">Vendas Hoje</span>
+          <span class="dash-card-value" id="vendasHoje">Carregando...</span>
+        </div>
+      </div>
     </div>
-  </section>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>&copy; 2026 DUFF Distribuidora de Bebidas. Todos os direitos reservados.</p>
-  </footer>
+    <!-- GRÁFICO -->
+    <div class="dash-chart-box">
+      <h2>Vendas dos últimos 7 dias</h2>
+      <canvas id="graficoVendas"></canvas>
+    </div>
+
+  </main>
 
   <!-- MODAL -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
@@ -98,4 +83,3 @@
   <script src="../JS/script.js"></script>
 </body>
 </html>
-
