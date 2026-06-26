@@ -165,6 +165,75 @@ app.get('/api/dashboard', async (req, res) => {
   }
 });
 
+app.get('/api/estoque', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT p.id, p.nome, p.preco, p.quantidade_estoque, p.tipo_unidade,
+              p.imagem, p.id_tipo, t.nome AS tipo, t.icone, t.cor
+       FROM produtos p
+       JOIN tipos_bebida t ON p.id_tipo = t.id
+       ORDER BY t.nome, p.nome`
+    );
+
+    const media =
+      rows.reduce((soma, p) => soma + p.quantidade_estoque, 0) / (rows.length || 1);
+
+    const ESTOQUE_BAIXO = 10;
+
+    const produtos = rows.map(p => ({
+      ...p,
+      status_estoque:
+        p.quantidade_estoque <= ESTOQUE_BAIXO
+          ? 'baixo'
+          : p.quantidade_estoque >= media * 1.5
+          ? 'alto'
+          : 'normal',
+    }));
+
+    res.json({ produtos, media: Math.round(media) });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+});
+
+// PUT atualizar quantidade de estoque de um produto
+app.put('/api/estoque/:id', async (req, res) => {
+  const { quantidade_estoque } = req.body;
+  if (quantidade_estoque === undefined || quantidade_estoque < 0) {
+    return res.status(400).json({ erro: 'Quantidade invalida' });
+  }
+  try {
+    const [result] = await pool.query(
+      'UPDATE produtos SET quantidade_estoque = ? WHERE id = ?',
+      [quantidade_estoque, req.params.id]
+    );
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ erro: 'Produto nao encontrado' });
+    }
+    res.json({ mensagem: 'Estoque atualizado' });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+});
+
+// POST cadastrar novo produto
+app.post('/api/produtos', async (req, res) => {
+  const { nome, preco, quantidade_estoque, tipo_unidade, imagem, id_tipo } = req.body;
+  if (!nome || !preco || !id_tipo) {
+    return res.status(400).json({ erro: 'Nome, preco e tipo sao obrigatorios' });
+  }
+  try {
+    const [result] = await pool.query(
+      `INSERT INTO produtos (nome, preco, quantidade_estoque, tipo_unidade, imagem, id_tipo)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [nome, preco, quantidade_estoque || 0, tipo_unidade || 'unidade', imagem || null, id_tipo]
+    );
+    res.status(201).json({ mensagem: 'Produto cadastrado', id: result.insertId });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+});
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('API DUFF rodando em http://localhost:' + PORT));

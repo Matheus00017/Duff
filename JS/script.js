@@ -11,7 +11,7 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// ===== ALERTS ou MODAL =====
+// ===== MODAL CADASTRO =====
 let currentEndpoint = '';
 
 function openCadastro(tipo) {
@@ -190,23 +190,22 @@ async function loadProducts(tipoId) {
     produtos.forEach(p => {
       const card = document.createElement('div');
       card.className = 'product-card';
-      const preco = parseFloat(p.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
       const imgContent = p.imagem
-        ? `<img class="product-img" src="/${p.imagem}" alt="${p.nome}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
+        ? `<img class="product-img" src="${p.imagem}" alt="${p.nome}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`
         + `<span class="product-emoji" style="display:none">${p.icone || '🍹'}</span>`
         : `<span class="product-emoji">${p.icone || '🍹'}</span>`;
       card.innerHTML = `
-         <div class="product-img-wrap" style="background:${p.cor || '#B8D4E8'}">${imgContent}</div>
-      <div class="product-info" style="background:#F0F8FC">
-        <div class="product-name">${p.nome}</div>
-        <div class="product-price">R$: ${parseFloat(p.preco).toFixed(2).replace('.', ',')}</div>
-        <div class="product-qty">
-          <button class="qty-btn" onclick="changeQty(this,-1)">-</button>
-          <input class="qty-input" type="number" value="0" min="0">
-          <button class="qty-btn" onclick="changeQty(this,1)">+</button>
+        <div class="product-img-wrap" style="background:${p.cor || '#B8D4E8'}">${imgContent}</div>
+        <div class="product-info" style="background:#F0F8FC">
+          <div class="product-name">${p.nome}</div>
+          <div class="product-price">R$: ${parseFloat(p.preco).toFixed(2).replace('.', ',')}</div>
+          <div class="product-qty">
+            <button class="qty-btn" onclick="changeQty(this,-1)">-</button>
+            <input class="qty-input" type="number" value="0" min="0">
+            <button class="qty-btn" onclick="changeQty(this,1)">+</button>
+          </div>
+          <button class="btn-comprar" onclick="comprar(this,${p.id},\`${p.nome}\`)">Comprar</button>
         </div>
-        <button class="btn-comprar" onclick="comprar(this,${p.id},\`${p.nome}\`)">Comprar</button>
-      </div>
       `;
       grid.appendChild(card);
     });
@@ -268,14 +267,13 @@ function initCarousel() {
   resumeCarousel();
 }
 
-// ===== INIT =====
-document.addEventListener('DOMContentLoaded', () => {
-  if (document.getElementById('categoryBar')) loadCategories();
-  if (document.getElementById('productsGrid')) loadProducts('');
-  if (document.getElementById('carouselDots')) initCarousel();
-});
-
+// ===== DASHBOARD =====
+// CORRIGIDO: guard verifica se os elementos existem antes de tentar usá-los.
+// Sem isso, todas as páginas que não são o Dashboard jogam erro no console.
 async function loadDashboard() {
+  const graficoEl = document.getElementById('graficoVendas');
+  if (!graficoEl) return; // sai silenciosamente se não estiver na página de Dashboard
+
   try {
     const res = await fetch('/api/dashboard');
     const data = await res.json();
@@ -288,15 +286,14 @@ async function loadDashboard() {
     document.getElementById('vendasHoje').textContent =
       parseFloat(data.vendasHoje || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-    // Gráfico
-    const ctx = document.getElementById('graficoVendas').getContext('2d');
+    const ctx = graficoEl.getContext('2d');
     new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: data.ultimos7dias.map(d => d.data),
+        labels: (data.ultimos7dias || []).map(d => d.data),
         datasets: [{
           label: 'Vendas (R$)',
-          data: data.ultimos7dias.map(d => d.total),
+          data: (data.ultimos7dias || []).map(d => d.total),
           backgroundColor: '#D98E2B',
           borderRadius: 6,
         }]
@@ -313,5 +310,187 @@ async function loadDashboard() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadDashboard);
+// ===== ESTOQUE =====
+async function loadEstoque() {
+  const grid = document.getElementById('estoqueGrid');
+  if (!grid) return;
 
+  try {
+    const res = await fetch('/api/estoque');
+    const { produtos } = await res.json();
+
+    if (!produtos.length) {
+      grid.innerHTML = '<div class="empty-msg">Nenhum produto cadastrado.</div>';
+      atualizarResumo([]);
+      return;
+    }
+
+    grid.innerHTML = '';
+    produtos.forEach(p => grid.appendChild(criarEstoqueCard(p)));
+    atualizarResumo(produtos);
+
+  } catch (err) {
+    grid.innerHTML = '<div class="error-msg">Erro ao carregar estoque.</div>';
+    console.error('Erro ao carregar estoque:', err);
+  }
+}
+
+function atualizarResumo(produtos) {
+  const baixo  = produtos.filter(p => p.status_estoque === 'baixo').length;
+  const alto   = produtos.filter(p => p.status_estoque === 'alto').length;
+  const normal = produtos.length - baixo - alto;
+
+  const elBaixo  = document.getElementById('qtdBaixo');
+  const elNormal = document.getElementById('qtdNormal');
+  const elAlto   = document.getElementById('qtdAlto');
+  if (elBaixo)  elBaixo.textContent  = baixo;
+  if (elNormal) elNormal.textContent = normal;
+  if (elAlto)   elAlto.textContent   = alto;
+}
+
+function criarEstoqueCard(p) {
+  const card = document.createElement('div');
+  card.className = 'estoque-card' +
+    (p.status_estoque === 'baixo' ? ' alerta-baixo' : '') +
+    (p.status_estoque === 'alto'  ? ' alerta-alto'  : '');
+
+  const imgContent = p.imagem
+    ? `<img src="${p.imagem}" alt="${p.nome}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+       <span class="product-emoji" style="display:none">${p.icone || '🍹'}</span>`
+    : `<span class="product-emoji">${p.icone || '🍹'}</span>`;
+
+  const badge = p.status_estoque === 'baixo'
+    ? '<span class="estoque-badge badge-baixo">Estoque Baixo</span>'
+    : p.status_estoque === 'alto'
+      ? '<span class="estoque-badge badge-alto">Acima da Média</span>'
+      : '';
+
+  card.innerHTML = `
+    ${badge}
+    <div class="estoque-img-wrap" style="background:${p.cor || '#B8D4E8'}">${imgContent}</div>
+    <div class="estoque-info">
+      <div class="estoque-nome">${p.nome}</div>
+      <div class="estoque-tipo">${p.tipo} • ${p.tipo_unidade}</div>
+      <div class="estoque-qtd-row">
+        <button class="qty-btn" onclick="alterarEstoque(${p.id}, -1)">-</button>
+        <input class="estoque-qtd-input" type="number" min="0" value="${p.quantidade_estoque}" id="qtd-${p.id}">
+        <button class="qty-btn" onclick="alterarEstoque(${p.id}, 1)">+</button>
+      </div>
+      <button class="btn-salvar-estoque" onclick="salvarEstoque(${p.id})">Salvar</button>
+    </div>
+  `;
+  return card;
+}
+
+function alterarEstoque(id, dir) {
+  const input = document.getElementById(`qtd-${id}`);
+  input.value = Math.max(0, parseInt(input.value || 0) + dir);
+}
+
+async function salvarEstoque(id) {
+  const input = document.getElementById(`qtd-${id}`);
+  const quantidade_estoque = parseInt(input.value || 0);
+
+  try {
+    const res = await fetch(`/api/estoque/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quantidade_estoque }),
+    });
+    if (res.ok) {
+      loadEstoque();
+    } else {
+      alert('Erro ao salvar estoque.');
+    }
+  } catch (err) {
+    alert('Erro de conexao com o servidor.');
+  }
+}
+
+// ===== MODAL NOVO PRODUTO =====
+async function openProdutoModal() {
+  const overlay = document.getElementById('produtoModalOverlay');
+  const select = document.getElementById('np_tipo');
+
+  if (select && select.options.length === 0) {
+    try {
+      const res = await fetch('/api/tipos-bebida');
+      const tipos = await res.json();
+      tipos.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = t.nome;
+        select.appendChild(opt);
+      });
+    } catch (err) {
+      console.error('Erro ao carregar tipos de bebida:', err);
+    }
+  }
+
+  overlay.classList.add('open');
+}
+
+function closeProdutoModal() {
+  document.getElementById('produtoModalOverlay').classList.remove('open');
+}
+
+function closeProdutoModalOutside(e) {
+  if (e.target === document.getElementById('produtoModalOverlay')) closeProdutoModal();
+}
+
+async function submitNovoProduto() {
+  const msg = document.getElementById('produtoFormMsg');
+  const g = (id) => document.getElementById(id).value.trim();
+
+  const body = {
+    nome: g('np_nome'),
+    preco: parseFloat(g('np_preco')),
+    quantidade_estoque: parseInt(g('np_quantidade') || 0),
+    tipo_unidade: g('np_unidade') || 'unidade',
+    imagem: g('np_imagem') || null,
+    id_tipo: g('np_tipo'),
+  };
+
+  if (!body.nome || !body.preco || !body.id_tipo) {
+    msg.className = 'form-msg error';
+    msg.textContent = 'Preencha nome, preco e tipo de bebida.';
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/produtos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      msg.className = 'form-msg success';
+      msg.textContent = 'Produto cadastrado com sucesso!';
+      setTimeout(() => {
+        closeProdutoModal();
+        msg.textContent = '';
+        msg.className = 'form-msg';
+        loadEstoque();
+      }, 1200);
+    } else {
+      msg.className = 'form-msg error';
+      msg.textContent = data.erro || 'Erro ao cadastrar produto.';
+    }
+  } catch (err) {
+    msg.className = 'form-msg error';
+    msg.textContent = 'Erro de conexao com o servidor.';
+  }
+}
+
+// ===== INIT UNIFICADO =====
+// CORRIGIDO: era dois addEventListener('DOMContentLoaded') separados —
+// o segundo sobrescrevia o primeiro em alguns browsers. Agora é um só.
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.getElementById('categoryBar'))  loadCategories();
+  if (document.getElementById('productsGrid')) loadProducts('');
+  if (document.getElementById('carouselDots')) initCarousel();
+  if (document.getElementById('graficoVendas')) loadDashboard();
+  if (document.getElementById('estoqueGrid'))  loadEstoque();
+});

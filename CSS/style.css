@@ -390,6 +390,61 @@ nav {
   border-radius: 16px 16px 0 0;
 }
 
+/* ===== ESTOQUE ===== */
+.estoque { padding: 40px; max-width: 1300px; margin: 0 auto; }
+
+.estoque-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.estoque-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 2px; }
+
+.btn-novo-produto {
+  background: var(--amber); color: var(--black); border: none; border-radius: 8px;
+  padding: 12px 22px; font-family: 'Fredoka', sans-serif; font-size: 1rem; font-weight: 600;
+  cursor: pointer; transition: background 0.2s, transform 0.1s;
+}
+.btn-novo-produto:hover { background: var(--amber-dark); transform: translateY(-1px); }
+
+.estoque-resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+.resumo-card { display: flex; align-items: center; gap: 14px; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.resumo-icon { font-size: 2rem; }
+.resumo-label { display: block; font-size: 0.85rem; font-weight: 600; color: #555; }
+.resumo-valor { display: block; font-size: 1.6rem; font-weight: 700; }
+
+.resumo-baixo { background: #FDE8E8; }
+.resumo-normal { background: #EAF2FB; }
+.resumo-alto { background: #E8F5E9; }
+
+.estoque-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px; }
+
+.estoque-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; flex-direction: column; position: relative; }
+.estoque-card.alerta-baixo { border: 2px solid var(--red); }
+.estoque-card.alerta-alto { border: 2px solid #2E7D32; }
+
+.estoque-img-wrap { height: 140px; display: flex; align-items: center; justify-content: center; }
+.estoque-img-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
+.estoque-img-wrap .product-emoji { font-size: 3rem; }
+
+.estoque-badge {
+  position: absolute; top: 8px; right: 8px; font-size: 0.72rem; font-weight: 700;
+  padding: 3px 8px; border-radius: 20px; color: white;
+}
+.badge-baixo { background: var(--red); }
+.badge-alto { background: #2E7D32; }
+
+.estoque-info { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.estoque-nome { font-weight: 600; font-size: 0.95rem; }
+.estoque-tipo { font-size: 0.78rem; color: #888; }
+
+.estoque-qtd-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.estoque-qtd-row .qty-btn { width: 26px; height: 26px; font-size: 1rem; }
+.estoque-qtd-input { width: 56px; height: 26px; text-align: center; border: 1px solid #aaa; border-radius: 4px; font-family: inherit; }
+
+.btn-salvar-estoque {
+  margin-top: 6px; padding: 6px; background: var(--black); color: white; border: none;
+  border-radius: 6px; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+}
+.btn-salvar-estoque:hover { background: #333; }
+.btn-salvar-estoque:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .modal-header h3 {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1.6rem;

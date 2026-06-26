@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DUFF - Distribuidora de Bebidas</title>
-  <link rel="stylesheet" href="CSS/style.css">
+  <title>DUFF - Estoque</title>
+  <link rel="stylesheet" href="../CSS/style.css">
 </head>
 <body>
 
-  <!-- HEADER -->
   <header>
     <div class="logo">
-      <img src="img/logo.png" alt="DUFF" onerror="this.style.display='none'">
+      <a href="../index.html">
+        <img src="../img/logo.png" alt="DUFF" onerror="this.style.display='none'">
+      </a>
       <span class="logo-text">DUFF</span>
     </div>
     <nav>
-      <button class="nav-btn" onclick="alert('Modulo Estoque em breve!')">Estoque</button>
-      <button class="nav-btn" onclick="alert('Modulo Vendas em breve!')">Vendas</button>
+      <a href="Pedido.html" class="nav-btn">Pedido</a>
+      <a href="Vendas.html" class="nav-btn">Vendas</a>
       <div class="dropdown">
         <button class="nav-btn" id="btnCadastro" onclick="toggleDropdown()">Cadastro ▾</button>
         <div class="dropdown-menu" id="dropdownMenu">
@@ -27,59 +28,46 @@
     </nav>
   </header>
 
-  <!-- CATEGORY BAR -->
-  <div class="category-bar" id="categoryBar">
-    <button class="cat-btn active" data-tipo="" onclick="filterProducts(this, '')">
-      <span class="icon">🍽</span>
-      <span>Todas</span>
-    </button>
-  </div>
+  <main class="estoque">
 
-  <!-- PRODUCTS -->
-  <section class="products-section">
-    <h2>NOSSOS PRODUTOS</h2>
-    <div class="products-grid" id="productsGrid">
-      <div class="loading-msg">Carregando produtos...</div>
+    <div class="estoque-header">
+      <h1 class="estoque-title">Controle de Estoque</h1>
+      <button class="btn-novo-produto" onclick="openProdutoModal()">+ Novo Produto</button>
     </div>
-  </section>
 
-  <!-- ABOUT -->
-  <section class="about-section">
-    <div class="about-content">
-      <h2>NOSSA HISTORIA</h2>
-      <p>A DUFF nasceu de um sonho simples: levar as melhores bebidas diretamente a quem mais entende do assunto. Tudo comecou em uma garagem, com um caminhao velho e muita vontade de servir bem.</p>
-      <p>Hoje somos uma distribuidora completa, com um catalogo que vai desde as cervejas artesanais ate os melhores vinhos e destilados importados. Cada produto escolhido a dedo, cada entrega feita com cuidado.</p>
-      <p>Seja para o seu bar, restaurante ou evento especial, a DUFF tem o que voce precisa. Qualidade, variedade e o preco que cabe no seu bolso.</p>
-    </div>
-    <div class="carousel" id="carousel"
-         onmouseenter="pauseCarousel()"
-         onmouseleave="resumeCarousel()">
-      <div class="carousel-track" id="carouselTrack">
-        <div class="carousel-slide">
-          <img src="img/carrossel/prateleiras 1.png" alt="prateleira" onerror="this.style.display='none'">
-        </div>
-        <div class="carousel-slide">
-          <img src="img/carrossel/prateleiras 2.png" alt="prateleira" onerror="this.style.display='none'">
-        </div>
-        <div class="carousel-slide">
-          <img src="img/carrossel/prateleiras 3.png" alt="prateleira" onerror="this.style.display='none'">
-        </div>
-        <div class="carousel-slide">
-          <img src="img/carrossel/prateleiras 4.png" alt="prateleira" onerror="this.style.display='none'">
+    <!-- RESUMO -->
+    <div class="estoque-resumo">
+      <div class="resumo-card resumo-baixo">
+        <span class="resumo-icon">⚠️</span>
+        <div>
+          <span class="resumo-label">Estoque Baixo</span>
+          <span class="resumo-valor" id="qtdBaixo">0</span>
         </div>
       </div>
-      <button class="carousel-btn prev" onclick="moveCarousel(-1)">&#8249;</button>
-      <button class="carousel-btn next" onclick="moveCarousel(1)">&#8250;</button>
-      <div class="carousel-dots" id="carouselDots"></div>
+      <div class="resumo-card resumo-normal">
+        <span class="resumo-icon">📦</span>
+        <div>
+          <span class="resumo-label">Estoque Normal</span>
+          <span class="resumo-valor" id="qtdNormal">0</span>
+        </div>
+      </div>
+      <div class="resumo-card resumo-alto">
+        <span class="resumo-icon">📈</span>
+        <div>
+          <span class="resumo-label">Acima da Média</span>
+          <span class="resumo-valor" id="qtdAlto">0</span>
+        </div>
+      </div>
     </div>
-  </section>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>&copy; 2026 DUFF Distribuidora de Bebidas. Todos os direitos reservados.</p>
-  </footer>
+    <!-- GRID DE PRODUTOS -->
+    <div class="estoque-grid" id="estoqueGrid">
+      <div class="loading-msg">Carregando estoque...</div>
+    </div>
 
-  <!-- MODAL -->
+  </main>
+
+  <!-- MODAL CADASTRO FUNCIONARIO/EMPRESA -->
   <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
     <div class="modal">
       <div class="modal-header">
@@ -93,7 +81,49 @@
     </div>
   </div>
 
-  <script src="JS/script.js"></script>
+  <!-- MODAL NOVO PRODUTO -->
+  <div class="modal-overlay" id="produtoModalOverlay" onclick="closeProdutoModalOutside(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>NOVO PRODUTO</h3>
+        <button class="modal-close" onclick="closeProdutoModal()">&#x2715;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Nome do produto</label>
+          <input type="text" id="np_nome" placeholder="Ex: Cerveja Heineken 600ml">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Preço (R$)</label>
+            <input type="number" id="np_preco" step="0.01" placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label>Quantidade inicial</label>
+            <input type="number" id="np_quantidade" placeholder="0">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Unidade</label>
+            <input type="text" id="np_unidade" placeholder="Ex: garrafa, lata, fardo">
+          </div>
+          <div class="form-group">
+            <label>Tipo de bebida</label>
+            <select id="np_tipo"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Caminho da imagem (opcional)</label>
+          <input type="text" id="np_imagem" placeholder="img/produto.png">
+        </div>
+        <button class="btn-submit" onclick="submitNovoProduto()">Cadastrar Produto</button>
+        <div class="form-msg" id="produtoFormMsg"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../JS/script.js"></script>
+  <script src="../JS/estoque.js"></script>
 </body>
 </html>
-
